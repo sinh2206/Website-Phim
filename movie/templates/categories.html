@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="sidebar">
+                <h3>Sidebar (Filters)</h3>
+                <ul>
+                    <li>
+                        <label for="genre">Genre:</label>
+                        <select name="genre" id="genre">
+                            <option value="action">Action</option>
+                            <option value="comedy">Comedy</option>
+                            <option value="drama">Drama</option>
+                            <!-- Add more genres as needed -->
+                        </select>
+                    </li>
+                    <li>
+                        <label for="year">Year:</label>
+                        <select name="year" id="year">
+                            {% for y in years %}
+                            <option value="{{ y }}">{{ y }}</option>
+                            {% endfor %}
+                        </select>
+                    </li>
+                    <li>
+                        <label for="rating">Rating:</label>
+                        <select name="rating" id="rating">
+                            {% for r in ratings %}
+                            <option value="{{ r }}">{{ r }} star</option>
+                            {% endfor %}
+                        </select>
+                    </li>
+                    <li>
+                        <form action="#" method="get">
+                            <label for="price">Price:</label>
+                            <select name="price" id="price">
+                                <option value="0">$0 - $10</option>
+                                <option value="10">$10 - $20</option>
+                                <option value="20">$20 - $30</option>
+                                <!-- Add more price ranges as needed -->
+                            </select>
+                            <button type="submit">Search</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- Movie List (Grid View) -->
+        <div class="col-md-9">
+            <h2>Movie List (Grid View)</h2>
+            <table class="movie-table">
+                <thead>
+                    <tr>
+                        <th>Movie Poster</th>
+                        <th>Movie Title</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movie in movies %}
+                    <tr>
+                        <td><img src="{{ movie.image_url }}" alt="{{ movie.title }}"></td>
+                        <td>{{ movie.title|linebreaks }}</td>
+                        <td>${{ movie.price|linebreaks }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

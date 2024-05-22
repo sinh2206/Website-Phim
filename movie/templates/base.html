@@ -1,0 +1,43 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Movie Store{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+  {% include 'header.html' %}
+
+  <div class="search-bar">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <form action="{% url 'search_movie' %}" method="get">
+            <input type="text" name="movie_title" placeholder="Search movies...">
+            <button type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% block content %}
+  {% endblock %}
+
+  <footer class="footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <p>Contact Info: contact@example.com</p>
+        </div>
+        <div class="col-md-6">
+          <p>Social Media Links: <a href="#">Facebook</a>, <a href="#">Twitter</a>, <a href="#">Instagram</a></p>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
