@@ -6,10 +6,11 @@
             <div class="col-md-3">
                 <a href="{% url 'index' %}"><img src="{% static 'logo.png' %}" alt="Movie Store"></a>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-6">
                 <ul>
                     <li><a href="{% url 'index' %}">Home</a></li>
                     <li><a href="{% url 'categories' %}">Categories</a></li>
+                    <li><a href="{% url 'movie_details' %}">Movie Details</a></li>
                     <li><a href="{% url 'cart' %}">Cart</a></li>
                     <li><a href="{% url 'signin' %}">Sign In</a></li>
                     <li><a href="{% url 'signup' %}">Sign Up</a></li>
@@ -18,4 +19,3 @@
         </div>
     </div>
 </header>
-

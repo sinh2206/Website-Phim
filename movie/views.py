@@ -29,7 +29,17 @@ def categories(request):
 
 
 def movie_details(request):
-    return render(request, 'movie_details.html')
+    if 'movie_id' in request.GET:
+        movie_id = request.GET['movie_id']
+        try:
+            movie = Movie.objects.get(id=movie_id)
+            return render(request, 'movie_details.html', {'movie': movie})
+        except Movie.DoesNotExist:
+            error_message = "Movie not found."
+            return render(request, 'movie_details.html', {'error_message': error_message})
+    else:
+        return render(request, 'movie_details.html')
+
 
 def signin(request):
     return render(request, 'signin.html')
@@ -38,21 +48,18 @@ def signup(request):
     return render(request, 'signup.html')
 
 def search_movie(request):
-    if request.method == 'GET':
-        movie_id = request.GET.get('movie_id')
-        movie_title = request.GET.get('movie_title')
-        
-        if movie_id:
-            movie = Movie.objects.filter(id=movie_id).first()
-        elif movie_title:
-            movie = Movie.objects.filter(title__icontains=movie_title).first()
-        else:
-            movie = None
-        
-        if movie:
+    if 'movie_id' in request.GET:
+        movie_id = request.GET['movie_id']
+        try:
+            movie = Movie.objects.get(id=movie_id)
             return render(request, 'movie_details.html', {'movie': movie})
-        else:
-            return render(request, 'movie_details.html', {'error_message': 'Movie not found'})
+        except Movie.DoesNotExist:
+            error_message = "Movie not found."
+            return render(request, 'index.html', {'error_message': error_message})
+    else:
+        return render(request, 'index.html')
+
+
 
 def checkout(request):
     return render(request, 'checkout.html')  # Thêm view checkout

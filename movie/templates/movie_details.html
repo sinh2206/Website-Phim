@@ -1,25 +1,30 @@
-kkk{% extends 'base.html' %}
+{% extends 'base.html' %}
 
 {% block content %}
 <div class="container">
+    <h2>Enter Movie ID</h2>
+    <form action="{% url 'movie_details' %}" method="get">
+        <label for="movie_id">Enter Movie ID:</label>
+        <input type="text" id="movie_id" name="movie_id" placeholder="Enter Movie ID">
+        <button type="submit">Search</button>
+    </form>
+
+    <!-- Display Movie Details -->
     {% if movie %}
-    <div class="row">
-        <div class="col-md-4">
-            <img src="{{ movie.image_url }}" alt="{{ movie.title }}">
-        </div>
-        <div class="col-md-8">
-            <h2>{{ movie.title }}</h2>
-            <p>Director: {{ movie.director }}</p>
-            <p>Actors: {{ movie.actors }}</p>
-            <p>{{ movie.summary }}</p>
-            <p>Rating: {{ movie.rating }}</p>
-            <p>Price: ${{ movie.price }}</p>
-            <button class="btn btn-primary">Buy Now</button>
-        </div>
+    <div class="movie-details">
+        <img src="{{ movie.image_url }}" alt="{{ movie.title }}">
+        <h2>{{ movie.title }}</h2>
+        <p><strong>Director:</strong> {{ movie.director }}</p>
+        <p><strong>Actors:</strong> {{ movie.actors }}</p>
+        <p><strong>Summary:</strong> {{ movie.summary }}</p>
+        <p><strong>Rating:</strong> {{ movie.rating }}</p>
+        <p><strong>Price:</strong> ${{ movie.price }}</p>
+        <button class="btn btn-primary">Buy Now</button>
     </div>
     {% else %}
+    {% if error_message %}
     <p>{{ error_message }}</p>
+    {% endif %}
     {% endif %}
 </div>
 {% endblock %}
-
