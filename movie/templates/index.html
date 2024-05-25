@@ -15,7 +15,9 @@
         <div class="row">
             {% for movie in popular_movies %}
             <div class="col-md-4">
-                <img src="{{ movie.image_url }}" alt="{{ movie.title }}">
+                <a href="{% url 'movie_details' movie.id %}">
+                    <img src="{{ movie.image_url }}" alt="{{ movie.title }}">
+                </a>
                 <h3>{{ movie.title }}</h3>
                 <p>{{ movie.summary }}</p>
                 <p>Price: ${{ movie.price }}</p>
@@ -27,7 +29,9 @@
         <div class="row">
             {% for movie in new_movies %}
             <div class="col-md-4">
-                <img src="{{ movie.image_url }}" alt="{{ movie.title }}">
+                <a href="{% url 'movie_details' movie.id %}">
+                    <img src="{{ movie.image_url }}" alt="{{ movie.title }}">
+                </a>
                 <h3>{{ movie.title }}</h3>
                 <p>{{ movie.summary }}</p>
                 <p>Price: ${{ movie.price }}</p>
@@ -37,4 +41,3 @@
     </div>
 </div>
 {% endblock %}
-
