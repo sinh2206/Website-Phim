@@ -1,40 +1,22 @@
-{% extends 'base.html' %}
-
-{% block content %}
-<div class="container">
-    <h1>Cart Items</h1>
-    <div class="cart-items-list">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Movie Poster</th>
-                    <th>Title</th>
-                    <th>Price</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in cart_items %}
-                <tr>
-                    <td><img src="{{ item.image_url }}" alt="{{ item.title }}" style="max-width: 100px;"></td>
-                    <td>{{ item.title }}</td>
-                    <td>${{ item.price }}</td>
-                    <td>
-                        <form action="{% url 'remove_from_cart' item.id %}" method="post">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Remove</button>
-                        </form>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <h3>Total Price: ${{ total_price }}</h3>
-            <a href="{% url 'checkout' %}" class="btn btn-primary">Checkout</a>
-        </div>
-    </div>
-</div>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cart</title>
+</head>
+<body>
+    <h2>Your Cart</h2>
+    <ul>
+        {% for movie in movies %}
+            <li>
+                <div style="background-image: url('{{ movie.get_poster_url }}');">
+                    <h3>{{ movie.title }}</h3>
+                    <p>{{ movie.runtime }} minutes</p>
+                    <a href="{% url 'remove_from_cart' movie.id %}">Remove</a>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'home' %}">Continue Shopping</a>
+</body>
+</html>

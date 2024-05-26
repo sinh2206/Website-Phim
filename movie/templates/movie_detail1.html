@@ -1,0 +1,23 @@
+{% extends 'base1.html' %}
+
+{% block title %}{{ movie.title }}{% endblock %}
+
+{% block content %}
+<h2>{{ movie.title }}</h2>
+<img src="{{ movie.get_poster_url }}" alt="{{ movie.title }} poster" style="width: 300px;">
+<p>{{ movie.overview }}</p>
+<p>Genres: {{ movie.genres }}</p>
+<p>Release Date: {{ movie.release_date }}</p>
+
+<h2>Recommended Movies</h2>
+<div class="movies-container">
+    {% for recommended_movie in recommended_movies %}
+        <div class="movie-card">
+            <a href="{% url 'movie_detail' recommended_movie.id %}">
+                <img src="{{ recommended_movie.get_poster_url }}" alt="{{ recommended_movie.title }} poster">
+                <h3>{{ recommended_movie.title }}</h3>
+            </a>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

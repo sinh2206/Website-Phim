@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cart</title>
+    <style>
+        /* Add some basic styling */
+        .cart-item {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'view_cart' %}">Cart</a></li>
+                <li><a href="{% url 'login' %}">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <h2>Your Cart</h2>
+        <div class="cart-container">
+            {% for item in cart_items %}
+                <div class="cart-item">
+                    <h3>{{ item.movie.title }}</h3>
+                    <p>{{ item.movie.runtime }} minutes</p>
+                    <p>Quantity: {{ item.quantity }}</p>
+                    <a href="{% url 'remove_from_cart' item.movie.id %}">Remove</a>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Movie Store</p>
+    </footer>
+</body>
+</html>

@@ -40,6 +40,13 @@ INSTALLED_APPS = [
     'movie',
 ]
 
+# settings.py
+
+LOGIN_REDIRECT_URL = '/'  # Redirect to the home page after login
+LOGOUT_REDIRECT_URL = '/login/'  # Redirect to the login page after logout
+LOGIN_URL = '/login/'  # URL for the login page
+
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -80,6 +87,12 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
 
 
 # Password validation
@@ -123,3 +136,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
+# Add this line at the end of the file or where other settings are defined
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

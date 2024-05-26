@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pay</title>
+    <style>
+        .movie-card {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            display: inline-block;
+            width: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+        .movie-card a {
+            text-decoration: none;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <h2>Pay</h2>
+    <div class="movies-container">
+        {% for movie in movies %}
+            <div class="movie-card" style="background-image: url('{{ movie.get_poster_url }}');">
+                <h3>{{ movie.title }}</h3>
+                <p>{{ movie.runtime }} minutes</p>
+            </div>
+        {% endfor %}
+    </div>
+    <h3>Total Amount: ${{ total_amount }}</h3>
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit">Pay Now</button>
+    </form>
+    <a href="{% url 'view_cart' %}">Back to Cart</a>
+</body>
+</html>

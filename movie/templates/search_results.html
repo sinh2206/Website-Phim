@@ -1,0 +1,36 @@
+<!-- search_results.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Results</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{% url 'home' %}">Home</a></li>
+                <li><a href="{% url 'home' %}">Movies</a></li>
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'view_cart' %}">Cart</a></li>
+                <li><a href="{% url 'pay' %}">Pay</a></li>
+                <li><a href="{% url 'user_settings' %}">Settings</a></li>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <h2>Search Results for "{{ query }}"</h2>
+    <div class="movies-container">
+        {% for movie in movies %}
+            <div class="movie-card" style="background-image: url('{{ movie.get_poster_url }}');">
+                <h3>{{ movie.title }}</h3>
+                <p>{{ movie.overview|truncatewords:20 }}</p>
+                <a href="{% url 'movie_detail' movie.id %}">View Details</a>
+            </div>
+        {% empty %}
+            <p>No movies found matching your query.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>
