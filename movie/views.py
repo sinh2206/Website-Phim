@@ -5,11 +5,13 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from .models import Movie, Cart, CartItem
+from .models import Movie, Cart, CartItem, PurchaseHistory
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from .forms import UserProfileForm, UserPasswordChangeForm
 
 
 # Load movie data into a DataFrame
@@ -132,21 +134,43 @@ def pay(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart)
     total_amount = sum(item.movie.price * item.quantity for item in cart_items)  # Assuming `price` is a field in Movie
+
+    if request.method == 'POST':
+        for item in cart_items:
+            PurchaseHistory.objects.create(
+                user=request.user,
+                title=item.movie.title,
+                quantity=item.quantity
+            )
+        cart_items.delete()
+        return redirect('home')  # Chuyển hướng người dùng về trang chủ sau khi thanh toán
+
     return render(request, 'pay.html', {'cart_items': cart_items, 'total_amount': total_amount})
 
 @login_required
 def user_settings(request):
     user = request.user
     if request.method == 'POST':
-        first_name = request.POST.get('first_name', user.first_name)
-        last_name = request.POST.get('last_name', user.last_name)
-        email = request.POST.get('email', user.email)
-        user.first_name = first_name
-        user.last_name = last_name
-        user.email = email
-        user.save()
-        return render(request, 'user_settings.html', {'user': user, 'success': True})
-    return render(request, 'user_settings.html', {'user': user})
+        profile_form = UserProfileForm(request.POST, instance=user)
+        password_form = UserPasswordChangeForm(request.POST, instance=user)
+
+        if profile_form.is_valid():
+            profile_form.save()
+            if password_form.is_valid():
+                user.set_password(password_form.cleaned_data['password'])
+                user.save()
+                update_session_auth_hash(request, user)  # Keep the user logged in after password change
+            return redirect('user_settings')
+
+    else:
+        profile_form = UserProfileForm(instance=user)
+        password_form = UserPasswordChangeForm()
+        purchase_history = PurchaseHistory.objects.filter(user=request.user)
+    return render(request, 'user_settings.html', {
+        'profile_form': profile_form,
+        'password_form': password_form,
+        'purchase_history': purchase_history
+    })
 
 def logout_view(request):
     logout(request)
