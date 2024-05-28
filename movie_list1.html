@@ -1,0 +1,68 @@
+{% extends 'base1.html' %}
+
+{% block title %}Movie List{% endblock %}
+
+{% block content %}
+<h2>Movies{% if selected_genre %} in {{ selected_genre }}{% endif %}</h2>
+<div class="movies-container">
+    {% for movie in page_obj %}
+        <div class="movie-card" style="background-image: url('{{ movie.get_poster_url }}');">
+            <a href="#" class="movie-link" data-id="{{ movie.id }}">
+                <div class="movie-details">
+                    <h3>{{ movie.title }}</h3>
+                    <p>{{ movie.runtime }} minutes</p>
+                </div>
+            </a>
+            <a href="{% url 'add_to_cart' movie.id %}" class="add-to-cart">Add to Cart</a>
+        </div>
+    {% endfor %}
+</div>
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+
+<!-- Modal -->
+<div id="movie-modal" class="modal">
+    <div class="modal-content">
+        <span class="close-modal">&times;</span>
+        <h2 id="modal-title"></h2>
+        <img id="modal-poster" src="" alt="Movie poster">
+        <p id="modal-overview"></p>
+        <p>Genres: <span id="modal-genres"></span></p>
+        <p>Release Date: <span id="modal-release-date"></span></p>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('.movie-link').on('click', function(e) {
+            e.preventDefault();
+            var movieId = $(this).data('id');
+            $.get('/movie/' + movieId + '/', function(data) {
+                $('#modal-title').text(data.title);
+                $('#modal-poster').attr('src', data.poster_path);
+                $('#modal-overview').text(data.overview);
+                $('#modal-genres').text(data.genres);
+                $('#modal-release-date').text(data.release_date);
+                $('#movie-modal').show();
+            });
+        });
+
+        $('.close-modal').on('click', function() {
+            $('#movie-modal').hide();
+        });
+    });
+</script>
+{% endblock %}
