@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .profile-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .profile-container h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .profile-container form {
+            display: flex;
+            flex-direction: column;
+        }
+        .profile-container label {
+            margin: 10px 0 5px;
+            color: #555;
+        }
+        .profile-container input,
+        .profile-container textarea {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .profile-container button {
+            padding: 12px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .profile-container button:hover {
+            background-color: #0056b3;
+        }
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .purchase-history {
+            margin-top: 30px;
+        }
+        .purchase-history h3 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .purchase-history table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .purchase-history th, .purchase-history td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .purchase-history th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <h2>User Profile</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ profile_form.as_p }}
+            {{ password_form.as_p }}
+            <div class="button-container">
+                <a href="{% url 'home' %}" class="back-button">Back to Home</a>
+                <button type="submit">Save</button>
+            </div>
+        </form>
+
+        <div class="purchase-history">
+            <h3>Purchase History</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Movie Title</th>
+                        <th>Quantity</th>
+                        <th>Purchase Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for purchase in purchase_history %}
+                        <tr>
+                            <td>{{ purchase.title }}</td>
+                            <td>{{ purchase.quantity }}</td>
+                            <td>{{ purchase.purchase_date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
