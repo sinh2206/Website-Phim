@@ -1,77 +1,109 @@
-/* static/css/cart.css */
-
 body {
+    background-color: #0A0A0A; /* Dark background */
+    color: #FFFFFF; /* White text */
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    background-color: #141414;
-    color: #fff;
     margin: 0;
-    padding: 0;
+    padding: 20px;
 }
 
 h2 {
-    color: #e50914;
+    text-align: center;
+    color: #E94560; /* Red color for headings */
+    margin-bottom: 20px;
+    font-size: 2.5em; /* Increased font size for the main heading */
+}
+
+.movies-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 40px; /* Increased gap between items */
+    margin: 20px 0;
+}
+
+.movie-card {
+    background-size: cover;
+    background-position: center;
+    width: calc(33% - 40px); /* Adjust width to fit 3 items in a row with space */
+    min-width: 250px;
+    height: 350px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    text-shadow: 1px 1px 2px black;
+    position: relative;
+    margin: 10px; /* Added margin for more spacing around each card */
+}
+
+.movie-card h3,
+.movie-card p {
+    margin: 0;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 5px;
+    border-radius: 5px;
+}
+
+h3 {
+    margin: 20px 0 10px;
+    color: #FFD700; /* Gold color for movie titles */
+}
+
+.total-amount h3 {
+    color: #E94560; /* Red color for total amount */
+    font-size: 1.5em; /* Increased font size for the total amount */
+}
+
+.button {
+    background-color: #E94560; /* Red background for buttons */
+    color: #FFFFFF; /* White text for buttons */
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+    display: inline-block;
+    margin: 10px 0;
+    text-align: center;
+    font-size: 1em; /* Increased font size for buttons */
+}
+
+.button:hover {
+    background-color: #B0304E; /* Darker red on hover */
+}
+
+.back-to-cart {
     text-align: center;
     margin-top: 20px;
 }
 
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    margin: 20px 0;
-    display: flex;
-    align-items: center;
-}
-
-div.poster {
-    background-size: cover;
-    background-position: center;
-    width: 150px;
-    height: 225px;
-    margin-right: 20px;
-    position: relative;
-}
-
-h3 {
-    margin: 0;
-    font-size: 18px;
-}
-
-p {
-    margin: 5px 0;
-}
-
-a {
-    color: #e50914;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-.cart-actions {
+form {
     text-align: center;
-    margin: 20px 0;
+    margin-top: 20px;
 }
 
-.cart-actions .button {
-    color: #fff;
-    background-color: #e50914;
+.total-amount {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.movie-card button {
+    background-color: #E94560;
+    color: #FFFFFF;
+    padding: 5px 10px;
     border: none;
-    padding: 10px 20px;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 16px;
     border-radius: 5px;
+    text-decoration: none;
     cursor: pointer;
-    margin: 0 10px;
+    margin-top: 10px;
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    bottom: 10px;
 }
 
-.cart-actions .button:hover {
-    background-color: #f40612;
-    text-decoration: none;
+.movie-card button:hover {
+    background-color: #B0304E;
 }
