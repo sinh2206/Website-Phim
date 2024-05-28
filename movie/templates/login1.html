@@ -2,23 +2,82 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/styles1.css' %}">
+    <title>Login or Sign Up</title>
+    <link rel="stylesheet" href="{% static 'css/login1.css' %}">
+    <style>
+        .form-container {
+            display: none;
+        }
+        .form-container.active {
+            display: block;
+        }
+    </style>
+    <script>
+        function showForm(formId) {
+            document.getElementById('login-form').classList.remove('active');
+            document.getElementById('signup-form').classList.remove('active');
+            document.getElementById(formId).classList.add('active');
+        }
+    </script>
 </head>
 <body>
-    <div class="login-container">
-        <h1>Login</h1>
+    <div class="container">
+        <h2>Please choose an option:</h2>
+        <button class="btn-action" onclick="showForm('login-form')">Log In</button>
+        <button class="btn-action" onclick="showForm('signup-form')">Sign Up</button>
+
         {% if error %}
             <p style="color: red;">{{ error }}</p>
         {% endif %}
-        <form method="POST">
-            {% csrf_token %}
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit">Login</button>
-        </form>
+
+        <div id="login-form" class="form-container">
+            <h2>Log In</h2>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="login" value="login">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Log In</button>
+                <button type="button" class="btn-back" onclick="showForm('')">Back</button>
+            </form>
+        </div>
+
+        <div id="signup-form" class="form-container">
+            <h2>Sign Up</h2>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="signup" value="signup">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="first_name">First Name:</label>
+                    <input type="text" id="first_name" name="first_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="last_name">Last Name:</label>
+                    <input type="text" id="last_name" name="last_name" required>
+                </div>
+                <button type="submit">Sign Up</button>
+                <button type="button" class="btn-back" onclick="showForm('')">Back</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>

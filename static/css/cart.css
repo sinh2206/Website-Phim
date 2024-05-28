@@ -1,0 +1,77 @@
+/* static/css/cart.css */
+
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: #141414;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+h2 {
+    color: #e50914;
+    text-align: center;
+    margin-top: 20px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin: 20px 0;
+    display: flex;
+    align-items: center;
+}
+
+div.poster {
+    background-size: cover;
+    background-position: center;
+    width: 150px;
+    height: 225px;
+    margin-right: 20px;
+    position: relative;
+}
+
+h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+p {
+    margin: 5px 0;
+}
+
+a {
+    color: #e50914;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.cart-actions {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.cart-actions .button {
+    color: #fff;
+    background-color: #e50914;
+    border: none;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 10px;
+}
+
+.cart-actions .button:hover {
+    background-color: #f40612;
+    text-decoration: none;
+}

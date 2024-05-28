@@ -1,15 +1,14 @@
-from django.core.paginator import Paginator
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+from django.core.paginator import Paginator
+from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from .models import Movie
+from .models import Movie, Cart, CartItem
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
-from .models import Movie, Cart, CartItem
-from django.contrib.auth import logout
-from django.db.models import Q
 
 # Load movie data into a DataFrame
 movies = Movie.objects.all().values('id', 'title', 'overview', 'poster_path', 'runtime', 'release_date', 'genres', 'movie_id')
@@ -46,12 +45,13 @@ def movie_detail(request, movie_id):
         'genres': movie.genres,
         'release_date': movie.release_date,
         'runtime': movie.runtime,
-        'poster_path': movie.poster_path,
+        'poster_path': movie.get_poster_url(),  # Ensure correct poster URL
+        'price': movie.price,  # Ensure this line is included
     }
-    movie = get_object_or_404(Movie, pk=movie_id)
     recommended_movies = get_recommendations(movie.title)
     print("Recommended movies for {}: {}".format(movie.title, recommended_movies))
     return JsonResponse(data)
+
 
 def category_view(request, genre):
     movies = Movie.objects.filter(genres__icontains=genre)
@@ -60,68 +60,59 @@ def category_view(request, genre):
 
 def login_view(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
+        if 'login' in request.POST:
+            username = request.POST['username']
+            password = request.POST['password']
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('home')
+            else:
+                return render(request, 'login1.html', {'error': 'Invalid username or password'})
+        elif 'signup' in request.POST:
+            username = request.POST['username']
+            password = request.POST['password']
+            email = request.POST['email']
+            first_name = request.POST['first_name']
+            last_name = request.POST['last_name']
+            if User.objects.filter(username=username).exists():
+                return render(request, 'login1.html', {'error': 'Username already exists'})
+            user = User.objects.create_user(username=username, password=password, email=email, first_name=first_name, last_name=last_name)
             login(request, user)
-            return redirect('home')  # Update to 'home'
-        else:
-            return render(request, 'login1.html', {'error': 'Invalid username or password'})
+            return redirect('home')
     else:
         return render(request, 'login1.html')
-
-
-def movie_list(request):
-    movies = Movie.objects.all()
-    genres = Movie.objects.values_list('genres', flat=True).distinct()
-    return render(request, 'movie_list1.html', {'movies': movies, 'genres': genres})
 
 @login_required
 def add_to_cart(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
     cart, created = Cart.objects.get_or_create(user=request.user)
     cart_item, created = CartItem.objects.get_or_create(cart=cart, movie=movie)
-    cart_item.quantity += 1
-    cart_item.save()
-    return redirect('cart')
+    if not created:
+        cart_item.quantity += 1
+        cart_item.save()
+    return redirect('view_cart')
 
 @login_required
 def view_cart(request):
-    cart = request.session.get('cart', [])
-    movies = Movie.objects.filter(id__in=cart)
-    return render(request, 'cart.html', {'movies': movies})
-
-@login_required
-def cart(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart)
     total_price = sum(item.movie.price * item.quantity for item in cart_items)  # Assuming `price` is a field in Movie
     return render(request, 'cart.html', {'cart_items': cart_items, 'total_price': total_price})
 
 @login_required
-def add_to_cart(request, movie_id):
-    movie = get_object_or_404(Movie, id=movie_id)
-    cart = request.session.get('cart', [])
-    if movie_id not in cart:
-        cart.append(movie_id)
-        request.session['cart'] = cart
-    return redirect('home')
-
-@login_required
 def remove_from_cart(request, movie_id):
-    cart = request.session.get('cart', [])
-    if movie_id in cart:
-        cart.remove(movie_id)
-        request.session['cart'] = cart
+    cart, created = Cart.objects.get_or_create(user=request.user)
+    cart_item = get_object_or_404(CartItem, cart=cart, movie_id=movie_id)
+    cart_item.delete()
     return redirect('view_cart')
 
 @login_required
 def pay(request):
-    cart = request.session.get('cart', [])
-    movies = Movie.objects.filter(id__in=cart)
-    total_amount = 0  # Since you don't have price data yet
-    return render(request, 'pay.html', {'movies': movies, 'total_amount': total_amount})
+    cart, created = Cart.objects.get_or_create(user=request.user)
+    cart_items = CartItem.objects.filter(cart=cart)
+    total_amount = sum(item.movie.price * item.quantity for item in cart_items)  # Assuming `price` is a field in Movie
+    return render(request, 'pay.html', {'cart_items': cart_items, 'total_amount': total_amount})
 
 @login_required
 def user_settings(request):
@@ -140,4 +131,3 @@ def user_settings(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
-

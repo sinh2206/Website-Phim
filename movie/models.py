@@ -2,23 +2,20 @@ from django.db import models
 from django.contrib.auth.models import User
 
 class Movie(models.Model):
-    genres = models.CharField(max_length=255, default='Unknown')
-    movie_id = models.IntegerField(unique=True)
+    title = models.CharField(max_length=255)
     overview = models.TextField()
-    poster_path = models.URLField()
-    release_date = models.DateField(default='2000-01-01')
-    runtime = models.IntegerField(default=0)
-    title = models.CharField(max_length=100)
+    poster_path = models.CharField(max_length=255)
+    runtime = models.IntegerField()
+    release_date = models.DateField()
+    genres = models.TextField()
+    movie_id = models.IntegerField(unique=True)
+    price = models.DecimalField(max_digits=5, decimal_places=2)  # Ensure this line is correct
 
-    def __str__(self):
-        return self.title
-    
     def get_poster_url(self):
-        return f'https://image.tmdb.org/t/p/w500{self.poster_path}'
-
-
+        return self.poster_path
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    movies = models.ManyToManyField(Movie, through='CartItem')
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)

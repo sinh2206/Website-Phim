@@ -3,20 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Cart</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/cart.css' %}">
 </head>
 <body>
     <h2>Your Cart</h2>
     <ul>
-        {% for movie in movies %}
+        {% for cart_item in cart_items %}
             <li>
-                <div style="background-image: url('{{ movie.get_poster_url }}');">
-                    <h3>{{ movie.title }}</h3>
-                    <p>{{ movie.runtime }} minutes</p>
-                    <a href="{% url 'remove_from_cart' movie.id %}">Remove</a>
+                <div class="poster" style="background-image: url('{{ cart_item.movie.get_poster_url }}');"></div>
+                <div>
+                    <h3>{{ cart_item.movie.title }}</h3>
+                    <p>{{ cart_item.movie.runtime }} minutes</p>
+                    <p>Price: ${{ cart_item.movie.price }}</p> <!-- Ensure this line is present -->
+                    <p>Quantity: {{ cart_item.quantity }}</p>
+                    <a href="{% url 'remove_from_cart' cart_item.movie.id %}">Remove</a>
                 </div>
             </li>
         {% endfor %}
     </ul>
-    <a href="{% url 'home' %}">Continue Shopping</a>
+    <div class="cart-actions">
+        <a href="{% url 'home' %}" class="button">Continue Shopping</a>
+        <a href="{% url 'pay' %}" class="button pay">Proceed to Pay</a>
+    </div>
 </body>
 </html>

@@ -3,37 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Pay</title>
-    <style>
-        .movie-card {
-            margin: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            display: inline-block;
-            width: 200px;
-            background-size: cover;
-            background-position: center;
-        }
-        .movie-card a {
-            text-decoration: none;
-            color: black;
-        }
-    </style>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/pay.css' %}">
 </head>
 <body>
     <h2>Pay</h2>
     <div class="movies-container">
-        {% for movie in movies %}
-            <div class="movie-card" style="background-image: url('{{ movie.get_poster_url }}');">
-                <h3>{{ movie.title }}</h3>
-                <p>{{ movie.runtime }} minutes</p>
+        {% for cart_item in cart_items %}
+            <div class="movie-card" style="background-image: url('{{ cart_item.movie.get_poster_url }}');">
+                <h3>{{ cart_item.movie.title }}</h3>
+                <p>{{ cart_item.movie.runtime }} minutes</p>
+                <p>Price: ${{ cart_item.movie.price }}</p> <!-- Ensure this line is present -->
+                <p>Quantity: {{ cart_item.quantity }}</p>
             </div>
         {% endfor %}
     </div>
     <h3>Total Amount: ${{ total_amount }}</h3>
     <form method="POST">
         {% csrf_token %}
-        <button type="submit">Pay Now</button>
+        <button type="submit" class="button">Pay Now</button>
     </form>
-    <a href="{% url 'view_cart' %}">Back to Cart</a>
+    <div class="back-to-cart">
+        <a href="{% url 'view_cart' %}" class="button">Back to Cart</a>
+    </div>
 </body>
 </html>

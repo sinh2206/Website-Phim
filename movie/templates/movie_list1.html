@@ -8,10 +8,12 @@
     {% for movie in page_obj %}
         <div class="movie-card" style="background-image: url('{{ movie.get_poster_url }}');">
             <a href="#" class="movie-link" data-id="{{ movie.id }}">
-                <h3>{{ movie.title }}</h3>
-                <p>{{ movie.runtime }} minutes</p>
+                <div class="movie-details">
+                    <h3>{{ movie.title }}</h3>
+                    <p>{{ movie.runtime }} minutes</p>
+                </div>
             </a>
-            <a href="{% url 'add_to_cart' movie.id %}">Add to Cart</a>
+            <a href="{% url 'add_to_cart' movie.id %}" class="add-to-cart">Add to Cart</a>
         </div>
     {% endfor %}
 </div>
@@ -40,8 +42,11 @@
         <p id="modal-overview"></p>
         <p>Genres: <span id="modal-genres"></span></p>
         <p>Release Date: <span id="modal-release-date"></span></p>
+        <p>Price: $<span id="modal-price"></span></p> <!-- Ensure this line is included -->
     </div>
 </div>
+
+
 
 <script>
     $(document).ready(function() {
@@ -49,18 +54,21 @@
             e.preventDefault();
             var movieId = $(this).data('id');
             $.get('/movie/' + movieId + '/', function(data) {
+                console.log(data); // Debug line to check the response
                 $('#modal-title').text(data.title);
                 $('#modal-poster').attr('src', data.poster_path);
                 $('#modal-overview').text(data.overview);
                 $('#modal-genres').text(data.genres);
                 $('#modal-release-date').text(data.release_date);
+                $('#modal-price').text(data.price); // Ensure this line is included
                 $('#movie-modal').show();
             });
         });
-
+    
         $('.close-modal').on('click', function() {
             $('#movie-modal').hide();
         });
     });
+    
 </script>
 {% endblock %}
