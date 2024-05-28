@@ -8,10 +8,12 @@
     {% for movie in page_obj %}
         <div class="movie-card" style="background-image: url('{{ movie.get_poster_url }}');">
             <a href="#" class="movie-link" data-id="{{ movie.id }}">
-                <h3>{{ movie.title }}</h3>
-                <p>{{ movie.runtime }} minutes</p>
+                <div class="movie-details">
+                    <h3>{{ movie.title }}</h3>
+                    <p>{{ movie.runtime }} minutes</p>
+                </div>
             </a>
-            <a href="{% url 'add_to_cart' movie.id %}">Add to Cart</a>
+            <a href="{% url 'add_to_cart' movie.id %}" class="add-to-cart">Add to Cart</a>
         </div>
     {% endfor %}
 </div>
