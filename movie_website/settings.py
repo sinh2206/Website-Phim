@@ -43,8 +43,8 @@ INSTALLED_APPS = [
 # settings.py
 
 LOGIN_REDIRECT_URL = '/'  # Redirect to the home page after login
-LOGOUT_REDIRECT_URL = '/login/'  # Redirect to the login page after logout
-LOGIN_URL = '/login/'  # URL for the login page
+LOGOUT_REDIRECT_URL = '/'  # Redirect to the login page after logout
+LOGIN_URL = ''  # URL for the login page
 
 
 MIDDLEWARE = [
