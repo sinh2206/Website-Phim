@@ -1,4 +1,5 @@
 import csv
+import json
 from django.core.management.base import BaseCommand
 from movie.models import Movie
 from datetime import datetime
@@ -11,6 +12,10 @@ class Command(BaseCommand):
         skipped_count = 0
         batch_size = 100  # Print progress every 100 movies
         preview_rows = 5  # Number of rows to preview
+
+        # Clear the existing data
+        Movie.objects.all().delete()
+        self.stdout.write(self.style.WARNING('Cleared all existing movie records'))
 
         try:
             with open('data/movies_metadata3.csv', newline='', encoding='utf-8') as csvfile:
@@ -66,22 +71,32 @@ class Command(BaseCommand):
                         skipped_count += 1
                         continue  # Skip this movie if price is out of the valid range
 
+                    # Process genres
+                    genres_str = row['genres']
+                    try:
+                        genres_list = json.loads(genres_str.replace("'", '"'))
+                        genres = ', '.join([genre['name'] for genre in genres_list])
+                    except json.JSONDecodeError:
+                        print(f'Skipping movie with invalid genres: {genres_str}')
+                        skipped_count += 1
+                        continue  # Skip this movie if genres are invalid
+
                     # Check if the movie already exists
                     if not Movie.objects.filter(movie_id=int(row['id'])).exists():
                         # Add more debug information here
-                        print(f"Creating movie: {row['title']} with price: {price}")
+                        print(f"Creating movie: {row['title']} with price: {price} and genres: {genres}")
                         movie = Movie(
                             title=row['title'],
                             overview=row['overview'],
                             poster_path=row['poster_path'],
                             runtime=runtime,
                             release_date=release_date,
-                            genres=row['genres'],
+                            genres=genres,
                             movie_id=int(row['id']),
                             price=price  # Set the price here
                         )
                         movie.save()
-                        print(f"Saved movie: {movie.title} with price: {movie.price}")
+                        print(f"Saved movie: {movie.title} with price: {movie.price} and genres: {movie.genres}")
 
                     # Update and print progress
                     processed_count += 1
@@ -89,7 +104,7 @@ class Command(BaseCommand):
                         self.stdout.write(f'Processed {processed_count} movies...')
 
             self.stdout.write(self.style.SUCCESS(f'Successfully loaded {processed_count} movies'))
-            self.stdout.write(self.style.WARNING(f'Skipped {skipped_count} movies due to invalid runtime or price'))
+            self.stdout.write(self.style.WARNING(f'Skipped {skipped_count} movies due to invalid runtime, price, or genres'))
 
         except Exception as e:
             self.stdout.write(self.style.ERROR(f'Error occurred: {e}'))

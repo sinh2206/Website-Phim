@@ -5,11 +5,13 @@ from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
-from .models import Movie, Cart, CartItem
+from .models import Movie, Cart, CartItem, PurchaseHistory
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
 from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from .forms import UserProfileForm, UserPasswordChangeForm
 
 
 # Load movie data into a DataFrame
@@ -41,14 +43,21 @@ def get_recommendations(title, cosine_sim=None):
     movie_indices = [i[0] for i in sim_scores]
     return df2['title'].iloc[movie_indices]
 
+
 @login_required
 def home(request):
-    movies = Movie.objects.all()
+    query = request.GET.get('query', '')
+    if query:
+        movies = Movie.objects.filter(Q(title__icontains=query)).distinct()
+    else:
+        movies = Movie.objects.all()
+    
     paginator = Paginator(movies, 10)  # Show 10 movies per page
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'movie_list1.html', {'page_obj': page_obj})
+    return render(request, 'movie_list1.html', {'page_obj': page_obj, 'query': query})
 
+@login_required
 def movie_detail(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
     data = {
@@ -57,12 +66,15 @@ def movie_detail(request, movie_id):
         'genres': movie.genres,
         'release_date': movie.release_date,
         'runtime': movie.runtime,
-        'poster_path': movie.get_poster_url(),  # Ensure correct poster URL
-        'price': movie.price,  # Ensure this line is included
+        'poster_path': movie.get_poster_url(),
+        'price': movie.price,
     }
     recommended_movies = get_recommendations(movie.title, cosine_sim)
-    print("Recommended movies for {}: {}".format(movie.title, recommended_movies))
+    recommended_movies_data = [{'id': Movie.objects.get(title=title).id, 'title': title} for title in recommended_movies]
+    data['recommended_movies'] = recommended_movies_data
     return JsonResponse(data)
+
+
 
 def category_view(request, genre):
     movies = Movie.objects.filter(genres__icontains=genre)
@@ -132,21 +144,44 @@ def pay(request):
     cart, created = Cart.objects.get_or_create(user=request.user)
     cart_items = CartItem.objects.filter(cart=cart)
     total_amount = sum(item.movie.price * item.quantity for item in cart_items)  # Assuming `price` is a field in Movie
+
+    if request.method == 'POST':
+        for item in cart_items:
+            PurchaseHistory.objects.create(
+                user=request.user,
+                title=item.movie.title,
+                quantity=item.quantity
+            )
+        cart_items.delete()
+        return redirect('home')  # Chuyển hướng người dùng về trang chủ sau khi thanh toán
+
     return render(request, 'pay.html', {'cart_items': cart_items, 'total_amount': total_amount})
+
 
 @login_required
 def user_settings(request):
     user = request.user
     if request.method == 'POST':
-        first_name = request.POST.get('first_name', user.first_name)
-        last_name = request.POST.get('last_name', user.last_name)
-        email = request.POST.get('email', user.email)
-        user.first_name = first_name
-        user.last_name = last_name
-        user.email = email
-        user.save()
-        return render(request, 'user_settings.html', {'user': user, 'success': True})
-    return render(request, 'user_settings.html', {'user': user})
+        profile_form = UserProfileForm(request.POST, instance=user)
+        password_form = UserPasswordChangeForm(request.POST, instance=user)
+
+        if profile_form.is_valid():
+            profile_form.save()
+            if password_form.is_valid():
+                user.set_password(password_form.cleaned_data['password'])
+                user.save()
+                update_session_auth_hash(request, user)  # Keep the user logged in after password change
+            return redirect('user_settings')
+        
+    else:
+        profile_form = UserProfileForm(instance=user)
+        password_form = UserPasswordChangeForm()
+        purchase_history = PurchaseHistory.objects.filter(user=request.user)
+    return render(request, 'user_settings.html', {
+        'profile_form': profile_form,
+        'password_form': password_form,
+        'purchase_history': purchase_history
+    })
 
 def logout_view(request):
     logout(request)

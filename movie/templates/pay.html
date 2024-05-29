@@ -2,29 +2,128 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pay</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/pay.css' %}">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .movies-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        .movie-card {
+            background-size: cover;
+            background-position: center;
+            width: 200px;
+            height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            color: #fff;
+            padding: 10px;
+            margin: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        .movie-card h3, .movie-card p {
+            margin: 5px 0;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .total-amount {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .total-amount h3 {
+            margin-bottom: 20px;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Pay</h2>
-    <div class="movies-container">
-        {% for cart_item in cart_items %}
-            <div class="movie-card" style="background-image: url('{{ cart_item.movie.get_poster_url }}');">
-                <h3>{{ cart_item.movie.title }}</h3>
-                <p>{{ cart_item.movie.runtime }} minutes</p>
-                <p>Price: ${{ cart_item.movie.price }}</p>
-                <p>Quantity: {{ cart_item.quantity }}</p>
-                <button class="button" onclick="window.location.href='{% url 'view_cart' %}'">Back to Cart</button>
-            </div>
-        {% endfor %}
+    <div class="container">
+        <h2>Pay</h2>
+        <div class="movies-container">
+            {% for cart_item in cart_items %}
+                <div class="movie-card" style="background-image: url('{{ cart_item.movie.get_poster_url }}');">
+                    <h3>{{ cart_item.movie.title }}</h3>
+                    <p>{{ cart_item.movie.runtime }} minutes</p>
+                    <p>Price: ${{ cart_item.movie.price }}</p>
+                    <p>Quantity: {{ cart_item.quantity }}</p>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="total-amount">
+            <h3>Total Amount: ${{ total_amount }}</h3>
+            <form method="POST" action="{% url 'pay' %}">
+                {% csrf_token %}
+                <button type="submit" class="button">Pay Now</button>
+            </form>
+        </div>
+        <div class="button-container">
+            <a href="{% url 'view_cart' %}" class="button">Back to Cart</a>
+        </div>
     </div>
-    <div class="total-amount">
-        <h3>Total Amount: ${{ total_amount }}</h3>
-        <form method="POST">
-            {% csrf_token %}
-            <button type="submit" class="button">Pay Now</button>
-        </form>
+
+    <div id="success-message" style="display: none;">
+        <h3>Your payment is successful</h3>
     </div>
+
+    <script>
+        document.getElementById('payment-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            fetch('{% url "pay" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelector('.movies-container').innerHTML = '';
+                    document.querySelector('.total-amount').innerHTML = '';
+                    document.getElementById('success-message').style.display = 'block';
+                } else {
+                    alert('Payment failed. Please try again.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
 </body>
 </html>

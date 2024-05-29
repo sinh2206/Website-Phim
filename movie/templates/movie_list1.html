@@ -42,33 +42,55 @@
         <p id="modal-overview"></p>
         <p>Genres: <span id="modal-genres"></span></p>
         <p>Release Date: <span id="modal-release-date"></span></p>
-        <p>Price: $<span id="modal-price"></span></p> <!-- Ensure this line is included -->
+        <p>Price: $<span id="modal-price"></span></p>
+
+        <!-- Recommendations Section -->
+        <div class="recommendations">
+            <h3>Recommended Movies</h3>
+            <ul id="recommended-movies-list">
+                <!-- Recommended movies will be appended here by JavaScript -->
+            </ul>
+        </div>
     </div>
 </div>
 
-
-
 <script>
     $(document).ready(function() {
-        $('.movie-link').on('click', function(e) {
-            e.preventDefault();
-            var movieId = $(this).data('id');
+        function showMovieDetails(movieId) {
             $.get('/movie/' + movieId + '/', function(data) {
-                console.log(data); // Debug line to check the response
                 $('#modal-title').text(data.title);
-                $('#modal-poster').attr('src', data.poster_path);
+                $('#modal-poster').attr('src', 'https://image.tmdb.org/t/p/w500' + data.poster_path);
                 $('#modal-overview').text(data.overview);
                 $('#modal-genres').text(data.genres);
                 $('#modal-release-date').text(data.release_date);
-                $('#modal-price').text(data.price); // Ensure this line is included
+                $('#modal-price').text(data.price);
+
+                // Display recommended movies
+                var recommendationsHtml = '';
+                data.recommended_movies.forEach(function(movie) {
+                    recommendationsHtml += '<li><a href="#" class="recommended-movie-link" data-id="' + movie.id + '">' + movie.title + '</a></li>';
+                });
+                $('#recommended-movies-list').html(recommendationsHtml);
+
                 $('#movie-modal').show();
             });
+        }
+
+        $('.movie-link').on('click', function(e) {
+            e.preventDefault();
+            var movieId = $(this).data('id');
+            showMovieDetails(movieId);
         });
-    
+
+        $(document).on('click', '.recommended-movie-link', function(e) {
+            e.preventDefault();
+            var movieId = $(this).data('id');
+            showMovieDetails(movieId);
+        });
+
         $('.close-modal').on('click', function() {
             $('#movie-modal').hide();
         });
     });
-    
 </script>
 {% endblock %}
